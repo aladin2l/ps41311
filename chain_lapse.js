@@ -3850,17 +3850,23 @@ function makeRpc(worker) {
                 : "the corrupted context is repaired and the environment is "
                   + "torn down" + (jailbroken ? ", and the process is root"
                     : "") + ". See the stage 8/9/10 marks for what is left.");
-            try {
-                stateEl.textContent = payloadRunning
-                    ? "ALL DONE GoldHEN Loaded Press (PS) to EXIT"
-					
-                    : kpatched ? "ROOT + KERNEL PATCHED -- NO REBOOT"
-                    : jailbroken ? "ROOT -- NO REBOOT NEEDED"
-                    : "REPAIRED -- NO REBOOT NEEDED";
-                    stateEl.className = "ok";  
-					document.body.classList.add("jb-ready");
-                  
-            } catch (e) { }
+           try {
+    stateEl.textContent = payloadRunning
+        ? "ALL DONE GoldHEN Loaded Press (PS) to EXIT"
+        : kpatched ? "ROOT + KERNEL PATCHED -- NO REBOOT"
+        : jailbroken ? "ROOT -- NO REBOOT NEEDED"
+        : "REPAIRED -- NO REBOOT NEEDED";
+    stateEl.className = "ok";  
+
+// FIX: Freeze the circles directly on the elements so NOTHING blanks out!
+    var sEl = document.getElementById("spin");
+    if (sEl) {
+        sEl.style.animation = "none";
+        sEl.style.borderTopColor = "#00d8ff"; // Retains original blue
+    }
+	
+} catch (e) { }
+
         }
     }
 })();

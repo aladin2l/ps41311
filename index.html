@@ -157,7 +157,7 @@ margin: 0; text-align: center; z-index: 5;"></h1>
         window.addEventListener("keydown", fire);
     }
 
-       var ac = window.applicationCache;
+          var ac = window.applicationCache;
     
     // FIX: High-speed local cache bypass runs with a 1-second timeout delay so elements can render
     if (localStorage.getItem("ormoc_cached") === "true") {
@@ -186,19 +186,22 @@ margin: 0; text-align: center; z-index: 5;"></h1>
         ac.addEventListener("downloading", function () {
             setCache("caching for offline (first run)...");
         }, false);
+        
         ac.addEventListener("progress", function (e) {
             if (e && e.total) {
                 var pct = Math.round((e.loaded / e.total) * 100);
                 setCache("caching " + pct + "%");
-                if (pct >= 100) {
-                    document.body.className = "cache-ready";
-                }
+                // REMOVED: The body class change has been deleted here so it doesn't interrupt the save process.
             }
         }, false);
+        
         ac.addEventListener("cached", function () {
+            // FIX: This is the ONLY place that should trigger when the database is officially closed and saved.
             localStorage.setItem("ormoc_cached", "true"); 
+            document.body.className = "cache-ready"; // Freeze spin wheel smoothly here
             waitForTap("CACHED (DONE) -- OFFLINE SAVED ", go);
         }, false);
+        
         ac.addEventListener("updateready", function () {
             try { ac.swapCache(); } catch (e) {}
             waitForTap("UPDATE READY -- press OK or tap to reload & run", function () {
@@ -218,6 +221,7 @@ margin: 0; text-align: center; z-index: 5;"></h1>
             waitForTap("CACHE OBSOLETE -- press OK or tap to run", go);
         }, false);
     }
+
 
 })();
 
