@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en" manifest="cache.appcache">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PS4 Ormoc Jailbreaker</title>
+  <style>
+    html, body { margin: 0; padding: 0; min-height: 100%; background: #0b0d10; color: #c8ced8; font: 15px/1.45 "Segoe UI", system-ui, sans-serif; }
+    #brand { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 20px 15px; background: linear-gradient(180deg, #10141d 0%, #0b0d10 100%); border-bottom: 1px solid #1e2732; }
+    #brand img { width: 160px; height: 48px; object-fit: contain; }
+    #brand b { font-size: 40px; font-weight: 800; letter-spacing: .08em; color: var(--text-primary, #ffffff); text-transform: uppercase; background: linear-gradient(90deg, #ffffff 0%, #a3b3cc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    #spin { position: fixed; top: 50%; left: 50%; width: 140px; height: 140px; margin: -74px 0 0 -74px; border: 4px solid #1e2732; border-top-color: #7fd0a0; border-radius: 50%; animation: spin 0.9s linear infinite; display: block; z-index: 1; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #running-circle { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 220px; height: 220px; border-radius: 50%; border: 3px dashed #00d8ff; background: transparent; box-shadow: inset 0 0 15px rgba(0, 191, 255, 0.1), 0 0 10px #00bfff; display: block; z-index: 1; }
+    #wrap { padding: 0; }
+    #state, 
+	#out { display: none; }
+    
+       /* ACTIVE OPERATION CONTROLLERS */
+    body.running #spin { display: block !important; border-top-color: #00d8ff !important; }
+    body.running #running-circle { display: block !important; }
+    
+    body.running #wrap, body.cache-ready #wrap { display: block !important; }
+    body.done #spin, body.done #running-circle, body.done #wrap, body.done #cache-status-text { display: none !important; }
+    
+    /* CACHE READY VISUAL OVERRIDES: COMPLETELY WIPS OFF THE LOADING SPIN WHEEL SEAMLESSLY */
+    body.cache-ready #spin { 
+        display: none !important; /* Hides the spin entirely from your canvas template views */
+    }
+    body.cache-ready #running-circle {
+        display: block !important;
+        border-color: #7fd0a0 !important;
+        box-shadow: inset 0 0 15px rgba(127, 208, 160, 0.1), 0 0 10px #7fd0a0 !important;
+    }
+    body.cache-ready #cache-status-text { 
+        display: block !important; 
+        position: fixed; 
+        top: 50%; 
+        left: 50%; 
+        transform: translate(-50%, -50%); 
+        text-align: center; 
+        z-index: 3; 
+    }
+
+    
+    #wrap { position: fixed; top: 75%; left: 0; right: 0; text-align: center; box-sizing: border-box; padding: 0 18px; }
+    #state { font-size: 22px; font-weight: 700; margin: 0 0 8px; display: block; }
+    #det { font-size: 20px; color: #8b95a3; margin: 0 0 6px; }
+    #det b { color: #c8ced8; font-weight: 600; }
+    #cache { font-size: 20px; color: #5c6672; margin: 0 0 10px; min-height: 14px; }
+    #cache.cacheok { color: #7fd0a0; }
+	
+    .ok { color: #7fd0a0; }
+    .bad { color: #7fd0a0; }
+    .warn { color: #d8c07f; }
+    .safe { color: #7fd0a0; }
+    .danger { color: #d08a7f; }
+	
+    code { color: #9fb3d0; }
+    
+    .contact-box { position: fixed; bottom: 30px; left: 0; right: 0; text-align: center; z-index: 10; }
+    .contact-number { font-size: 20px; font-weight: 800; color: #7fd0a0; letter-spacing: 2.0px; background: #11151b; display: inline-block; padding: 8px 16px; border: 1px solid #1e2732; border-radius: 20px; }
+    body.log .contact-box { display: none; }
+
+    #cache-status-text { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 3; display: none; }
+    .status-done { font-size: 40px; font-weight: 800; color: #7fd0a0; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; text-shadow: 0 0 10px rgba(127, 208, 160, 0.4); }
+    .status-action { font-size: 50px; font-weight: 800; color: #3bd8ff; text-transform: uppercase; letter-spacing: 2px; }
+	
+</style>
+</head>
+<body>
+
+  <div id="brand"> 
+    <img src="logo_raw.png" alt="" width="28" height="28">
+  </div>
+  <div id="brand">
+    <b>Ormoc Gaming Console Repair</b>
+  </div>
+
+  <div id="spin"></div>
+  <div id="running-circle"></div>
+  
+
+  <div id="cache-status-text">
+    <div class="status-done">PRESS</div>
+    <div class="status-action">OK</div>
+    
+  </div>
+ 
+<h1 id="msgs" style="font-size: 27px; font-weight: 900; color: #a3e635; text-transform: uppercase; 
+letter-spacing: 2px; text-shadow: 0 0 12px rgba(163, 230, 53, 0.7), 0 0 25px rgba(163, 230, 53, 0.4), 
+0 4px 10px rgba(0, 0, 0, 0.9); position: fixed; top: 71%; left: 50%; transform: translate(-50%, -50%); 
+margin: 0; text-align: center; z-index: 5;"></h1>
+
+  <div id="wrap">
+    <div id="state">detecting firmware...</div>
+    <div id="det"></div>
+	<div id="cache"></div>
+    <div id="out"></div>
+  </div>
+
+
+  <div class="contact-box">
+    <div class="contact-number">Contact: Fb : Aladin F. Toel 09066876054</div>
+  </div>
+
+
+<script>
+(function () {
+    var stateEl = document.getElementById("state");
+    var detEl = document.getElementById("det");
+    var cacheEl = document.getElementById("cache");
+    function setState(t, c) { stateEl.textContent = t; stateEl.className = c || ""; }
+    function setCache(t, ok) { cacheEl.textContent = t; cacheEl.className = ok ? "cacheok" : ""; }
+    var params = new URLSearchParams(location.search);
+
+    var key = null, fwnum = null;
+    var m = /PlayStation\s+4[\/ ](\d+)\.(\d+)/.exec(navigator.userAgent);
+    if (m) {
+        var minor = parseInt(m[2], 16);
+        var ms = minor.toString(16);
+        if (ms.length < 2) ms = "0" + ms;
+        key = m[1] + "." + ms;
+        fwnum = parseInt(m[1], 10) * 100 + parseInt(ms, 10);
+    }
+    var bug = null, why = "";
+    var forced = params.get("bug");
+    if (forced === "lapse" || forced === "poops") {
+        bug = forced; why = "forced via ?bug=" + forced;
+    } else if (!key) {
+        why = "user-agent is not a PlayStation 4";
+    } else if (fwnum <= 1202) {
+        bug = "lapse"; why = key + " <= 12.02";
+    } else if (fwnum >= 1250) {
+        bug = "poops"; why = key + " >= 12.50";
+    } else {
+        why = key + " -- no working bug (lapse ends at 12.02, poops needs 12.50)";
+    }
+    detEl.innerHTML = "firmware <b>" + (key || "unknown") + "</b>"
+        + " &middot; bug <b>" + (bug || "none") + "</b> &middot; " + why;
+
+    if (!bug) { setState("UNSUPPORTED FIRMWARE", "bad"); return; }
+
+    var target = (bug === "lapse" ? "lapse.html" : "poops.html")
+        + location.search;
+    function go() { setState("loading " + bug + " chain...", "warn");
+                    location.replace(target); }
+
+    function waitForTap(msg, action) {
+        setState(msg, "warn");
+        function fire() {
+            window.removeEventListener("click", fire);
+            window.removeEventListener("keydown", fire);
+            action();
+        }
+        window.addEventListener("click", fire);
+        window.addEventListener("keydown", fire);
+    }
+
+       var ac = window.applicationCache;
+    
+    // FIX: High-speed local cache bypass runs with a 1-second timeout delay so elements can render
+    if (localStorage.getItem("ormoc_cached") === "true") {
+        setCache("CACHED OFFLINE READY", true);
+        document.body.className = "cache-ready"; // Tells CSS to freeze the spin ring immediately
+        setTimeout(go, 1000); // 1-second buffer delay allows "CACHED OFFLINE READY" to stay on screen
+    } else if (!ac || !document.documentElement.hasAttribute("manifest")) {
+        go();
+    } else if (!navigator.onLine) {
+        setCache("offline -- from cache", true);
+        document.body.className = "cache-ready";
+        setTimeout(go, 1000);
+    } else if (ac.status === ac.IDLE) {
+        localStorage.setItem("ormoc_cached", "true"); 
+        setCache("cached ready", true);
+        document.body.className = "cache-ready";
+        setTimeout(go, 1000);
+    } else if (ac.status === ac.UPDATEREADY) {
+        try { ac.swapCache(); } catch (e) {}
+        setCache("update downloaded", true);
+        waitForTap("UPDATE READY -- press OK or tap to reload & run", function () {
+            location.reload();
+        });
+    } else {
+        setCache("checking cache...");
+        ac.addEventListener("downloading", function () {
+            setCache("caching for offline (first run)...");
+        }, false);
+        ac.addEventListener("progress", function (e) {
+            if (e && e.total) {
+                var pct = Math.round((e.loaded / e.total) * 100);
+                setCache("caching " + pct + "%");
+                if (pct >= 100) {
+                    document.body.className = "cache-ready";
+                }
+            }
+        }, false);
+        ac.addEventListener("cached", function () {
+            localStorage.setItem("ormoc_cached", "true"); 
+            waitForTap("CACHED (DONE) -- OFFLINE SAVED ", go);
+        }, false);
+        ac.addEventListener("updateready", function () {
+            try { ac.swapCache(); } catch (e) {}
+            waitForTap("UPDATE READY -- press OK or tap to reload & run", function () {
+                location.reload();
+            });
+        }, false);
+        ac.addEventListener("noupdate", function () {
+            localStorage.setItem("ormoc_cached", "true"); 
+            setCache("CACHED OFFLINE READY", true);
+            document.body.className = "cache-ready";
+            setTimeout(go, 1000); 
+        }, false);
+        ac.addEventListener("error", function () {
+            waitForTap("CACHE FAILED -- press OK or tap to run anyway", go);
+        }, false);
+        ac.addEventListener("obsolete", function () { 
+            waitForTap("CACHE OBSOLETE -- press OK or tap to run", go);
+        }, false);
+    }
+
+})();
+
+</script>
+
+</body>
+</html>
